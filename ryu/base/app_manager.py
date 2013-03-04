@@ -126,6 +126,7 @@ class AppManager(object):
         mod = utils.import_module(name)
         clses = inspect.getmembers(mod, lambda cls: (inspect.isclass(cls) and
                                                      issubclass(cls, RyuApp)))
+        print 'classes: ', clses
         if clses:
             return clses[0][1]
         return None
@@ -152,7 +153,10 @@ class AppManager(object):
                 assert cls == context_cls
 
     def create_contexts(self):
+        print 'context_cls:', self.contexts_cls.items()
+        print 'contexts:', self.contexts
         for key, cls in self.contexts_cls.items():
+            print key, cls
             context = cls()
             LOG.info('creating context %s', key)
             assert not key in self.contexts
@@ -177,6 +181,8 @@ class AppManager(object):
             assert len(Datapath.supported_ofp_version), \
                 'No OpenFlow version is available'
 
+            print 'self.applications:', self.applications
+            print 'self.applications_cls:', self.applications_cls
             assert app_name not in self.applications
             app = cls(*args, **kwargs)
             register_app(app)

@@ -64,6 +64,7 @@ def main():
     app_mgr = AppManager()
     app_mgr.load_apps(CONF.app_lists)
     contexts = app_mgr.create_contexts()
+    print contexts
     app_mgr.instantiate_apps(**contexts)
 
     services = []

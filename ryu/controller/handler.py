@@ -34,6 +34,9 @@ def set_ev_cls(ev_cls, dispatchers=None):
         handler.ev_cls = ev_cls
         handler.dispatchers = _listify(dispatchers)
         handler.observer = ev_cls.__module__
+        print 'ev_cls:', ev_cls
+        print 'ev_cls._module__:', ev_cls.__module__
+        print 'dispatchers:', dispatchers
         return handler
     return _set_ev_cls_dec
 
