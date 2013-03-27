@@ -125,6 +125,8 @@ def msg_pack_into(fmt, buf, offset, *args):
         buf += bytearray(offset - len(buf))
 
     if len(buf) == offset:
+        print 'fmt:', fmt
+        print 'args:', args
         buf += struct.pack(fmt, *args)
         return
 

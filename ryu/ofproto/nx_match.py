@@ -57,6 +57,7 @@ MF_PACK_STRING_BE32 = '!I'
 MF_PACK_STRING_BE16 = '!H'
 MF_PACK_STRING_8 = '!B'
 MF_PACK_STRING_MAC = '!6s'
+MF_PACK_STRING_IPV6_ADDR = '!16s'
 
 _MF_FIELDS = {}
 
@@ -409,11 +410,14 @@ class MFField(object):
         (header,) = struct.unpack_from('!I', buf, offset)
 
         cls_ = MFField._FIELDS_HEADERS.get(header)
+        print hex(header)
+        print ' '.join(hex(ord(char)) for char in buf)
+        print offset
+        print cls_
 
         if cls_:
             field = cls_.field_parser(header, buf, offset)
         else:
-            # print 'unknown field type'
             raise
         field.length = (header & 0xff) + 4
 
@@ -453,7 +457,7 @@ class MFField(object):
 
     def _putv6(self, buf, offset, value):
         ofproto_parser.msg_pack_into(self.pack_str, buf, offset,
-                                     *value)
+                                     value)
         return self.n_bytes
 
     def putv6(self, buf, offset, value, mask):
@@ -725,7 +729,15 @@ class MFArpSha(MFField):
 @_register_make
 @_set_nxm_headers([ofproto_v1_0.NXM_NX_IPV6_SRC,
                    ofproto_v1_0.NXM_NX_IPV6_SRC_W])
+@MFField.register_field_header([ofproto_v1_0.NXM_NX_IPV6_SRC,
+                            ofproto_v1_0.NXM_NX_IPV6_SRC_W])
 class MFIPV6Src(MFField):
+    pack_str = MF_PACK_STRING_IPV6_ADDR
+
+    def __init__(self, header, value, mask = None):
+        super(MFIPV6Src, self).__init__(header, MFIPV6Src.pack_str)
+        self.value = value
+
     @classmethod
     def make(cls, header):
         return cls(header, '!4I')
@@ -974,6 +986,8 @@ def serialize_nxm_match(rule, buf, offset):
     if not rule.wc.wildcards & FWW_IPV6_LABEL:
         offset += nxm_put(buf, offset, ofproto_v1_0.NXM_NX_IPV6_LABEL, rule)
 
+    print 'src', rule.flow.ipv6_src
+    print 'mask', rule.wc.ipv6_src_mask
     if len(rule.flow.ipv6_src):
         if len(rule.wc.ipv6_src_mask):
             header = ofproto_v1_0.NXM_NX_IPV6_SRC_W
