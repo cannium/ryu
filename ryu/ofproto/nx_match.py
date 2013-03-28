@@ -410,14 +410,11 @@ class MFField(object):
         (header,) = struct.unpack_from('!I', buf, offset)
 
         cls_ = MFField._FIELDS_HEADERS.get(header)
-        print hex(header)
-        print ' '.join(hex(ord(char)) for char in buf)
-        print offset
-        print cls_
 
         if cls_:
             field = cls_.field_parser(header, buf, offset)
         else:
+            # print 'unknown field type'
             raise
         field.length = (header & 0xff) + 4
 
@@ -740,7 +737,7 @@ class MFIPV6Src(MFField):
 
     @classmethod
     def make(cls, header):
-        return cls(header, '!4I')
+        return cls(header, MFIPV6Src.pack_str)
 
     def put(self, buf, offset, rule):
         return self.putv6(buf, offset,
@@ -986,8 +983,6 @@ def serialize_nxm_match(rule, buf, offset):
     if not rule.wc.wildcards & FWW_IPV6_LABEL:
         offset += nxm_put(buf, offset, ofproto_v1_0.NXM_NX_IPV6_LABEL, rule)
 
-    print 'src', rule.flow.ipv6_src
-    print 'mask', rule.wc.ipv6_src_mask
     if len(rule.flow.ipv6_src):
         if len(rule.wc.ipv6_src_mask):
             header = ofproto_v1_0.NXM_NX_IPV6_SRC_W
