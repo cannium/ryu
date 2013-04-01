@@ -131,7 +131,7 @@ class Discovery(app_manager.RyuApp):
         tlv_ttl = lldp.TTL(ttl = Discovery.LLDP_TTL)
         tlv_end = lldp.End()
         for port_no, port in datapath.ports.iteritems():
-            if port_no > datapath.ofproto.OFPP_MAX:
+            if port_no >= datapath.ofproto.OFPP_MAX:
                 continue
             pkt = packet.Packet()
             eth_packet = ethernet.ethernet(dst = lldp.LLDP_MAC_NEAREST_BRIDGE,
