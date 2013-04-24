@@ -94,6 +94,7 @@ class OFPMatch(object):
     def __init__(self, wildcards, in_port, dl_src, dl_dst, dl_vlan,
                  dl_vlan_pcp, dl_type, nw_tos, nw_proto, nw_src,
                  nw_dst, tp_src, tp_dst):
+        super(OFPMatch, self).__init__()
         self.wildcards = wildcards
         self.in_port = in_port
         if dl_src == 0:
